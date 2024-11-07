@@ -1,0 +1,36 @@
+﻿@using BaseCoffee.BLL.DTOs
+@model IEnumerable<dynamic> //çalışma anında karar veriyor birden fazla tür olduğu iin içerisinde
+
+<h2>Products</h2>
+<a asp-action="Create" class="btn btn-primary"> New Product Add</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>CategoryID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>StockQuantity</th>
+            <th>Category Name</th>
+            <th>Delete</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.CategoryID</td>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+                <td>@product.Description</td>
+                <td>@product.StockQuantity</td>
+                <td>@product.categoryName</td>
+                <td><a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete Category</a></td>
+                <td><a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning">Edit Category</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

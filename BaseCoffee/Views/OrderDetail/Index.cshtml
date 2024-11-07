@@ -1,0 +1,50 @@
+﻿@using BaseCoffee.BLL.DTOs
+@model IEnumerable<dynamic>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Sipariş ID </th>
+            <th>Sipariş Tarihi</th>
+            <th>Toplam tutar</th>
+            <th>Durum</th>
+            <th>Ürün Detayları </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.OrderDate.ToString("g")</td>
+                <td>@order.TotalAmount</td>
+                <td>@order.Status</td>
+                <td>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Ürün ID</th>
+                                <th>Ürün Adı</th>
+                                <th>Ürün Mikarı</th>
+                                <th>Birim Fiaytı</th>
+                                <th>Kategori</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detail in order.OrderDetails)
+                            {
+                                <tr>
+                                    <td>@detail.ProductID</td>
+                                    <td>@detail.ProductName</td>
+                                    <td>@detail.Quantity</td>
+                                    <td>@detail.UnitPrice</td>
+                                    <td>@detail.CategoryName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

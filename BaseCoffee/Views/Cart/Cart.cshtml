@@ -1,0 +1,104 @@
+﻿@model IEnumerable<dynamic>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total Amount</th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody id="cartItems">
+        <!-- sepette varsa bunm dinamik olarak ekleyeceğim-->
+    </tbody>
+</table>
+
+<p id="totalAmount">Total Amount 0.00</p>
+<button id="complateOrder" class="btn btn-success">Complete Order</button>
+
+<script>
+    // Sepeti yerel depolamadan alıp görüntüleyen fonksiyon
+    function renderCartItems() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartItemsContainer = document.getElementById('cartItems');
+        let totalAmount = 0;
+        cartItemsContainer.innerHTML = ''; // Önce içeriği temizle
+
+        // Her ürünü tabloya ekle
+        cart.forEach(product => {
+            const subtotal = product.price * product.quantity;
+            totalAmount += subtotal;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+    <td>${product.name}</td>
+    <td>₺${product.price.toFixed(2)}</td>
+    <td>${product.quantity}</td>
+    <td>₺${subtotal.toFixed(2)}</td>
+    <td><button class="btn btn-danger remove-from-cart" data-id="${product.id}">Kaldır</button></td>
+                            `;
+            cartItemsContainer.appendChild(row);
+        });
+
+        document.getElementById('totalAmount').textContent = `Toplam Tutar: ₺${totalAmount.toFixed(2)}`;
+        attachRemoveItemEvents(); // Ürün kaldırma butonlarına etkinlik ekle
+    }
+
+    // Ürün kaldırma işlemi
+    function attachRemoveItemEvents() {
+        document.querySelectorAll('.remove-from-cart').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-id');
+                removeFromCart(productId);
+            });
+        });
+    }
+
+    // Sepetten ürün kaldırma işlemi
+    function removeFromCart(productId) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart = cart.filter(item => item.id !== productId); // Ürünü listeden kaldır
+        localStorage.setItem('cart', JSON.stringify(cart)); // Güncellenmiş sepeti kaydet
+        renderCartItems(); // Sepeti yeniden render et
+        updateCartCount();
+    }
+
+
+    //AJAX ile sipişi tamamla
+    document.getElementById('complateOrder').addEventListener('click', () => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        if (cart.length == 0) {
+            alert("Cart is null , The not Order completed");
+            return;
+        }
+        //veriyi isteilen formata dönüştürme
+
+        const cartData = cart.map(item => ({
+            productID: item.id,
+            quantity: item.quantity
+        }));
+
+        $.ajax({
+            url: '/Cart/CompleteOrder',//metodu yolunu veriniz
+            type: 'POST', //httpVerb ynai kullanılan metodun http karşılığı
+            contentType: 'application/json', // kullanılan tip
+            data: JSON.stringify(cartData),//elimizdeki gödrmek istediğim data
+            success: function (response) {
+                alert(response);//başarı mesajını döner
+                localStorage.removeItem('cart');//sepeti temizle
+                renderCartItems();//sepetin görüntüsünü güncelle
+
+            },
+            error: function () {
+                alert("Somethings is wrong")
+            }
+        });
+
+    });
+    renderCartItems();
+
+</script>
