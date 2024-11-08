@@ -1,18 +1,23 @@
 ﻿using BaseCoffee.DAL.Entities.Concrete;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BaseCoffee.DAL.Context
 {
-    public class MyDbContext : DbContext
+    public class MyDbContext : IdentityDbContext<AppUser, IdentityRole<string>, string>
     {
-        public MyDbContext(DbContextOptions options) : base(options) { }
+        public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
 
         public DbSet<Category> Categories { get; set; }
+
+        public DbSet<IdentityRole<string>> IdentityRoles { get; set; }
 
         public DbSet<Cart> Carts { get; set; }
 
@@ -24,6 +29,35 @@ namespace BaseCoffee.DAL.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<IdentityRole<string>>().HasData(
+                new IdentityRole<string> { Id= "c9bbce7e-7372-47f2-80e9-029ce117f245", Name="Customer", NormalizedName="CUSTOMER"},
+                new IdentityRole<string> { 
+                Id= "329d3be5-8001-4997-85a9-ebc16be771c2",
+                Name="Admin",
+                NormalizedName = "ADMIN"
+                }
+                );
+            var hasher = new PasswordHasher<AppUser>();
+            modelBuilder.Entity<AppUser>().HasData(new AppUser
+            {
+                Id = "252d1809-cd07-4ebd-87d1-83cefac3b78c",
+                UserName = "admin@gmail.com",
+                NormalizedUserName = "ADMIN@GMAIL.COM",
+                Email = "admin@gmail.com",
+                EmailConfirmed = true,
+                PasswordHash = hasher.HashPassword(null, "Admin123."),
+                SecurityStamp = "87b82a5e-69c1-4831-87d0-678b208084ae",
+                ConcurrencyStamp = "55c5fc1a-1d71-4de4-b65e-e14eed798ade",
+                LockoutEnabled = false
+            });
+
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+            {
+                RoleId = "329d3be5-8001-4997-85a9-ebc16be771c2",
+                UserId = "252d1809-cd07-4ebd-87d1-83cefac3b78c"
+            });
+
+            base.OnModelCreating(modelBuilder);
             // Kategorileri Seed Et
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Beverages", Description = "Hot and cold drinks" },

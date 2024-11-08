@@ -15,6 +15,10 @@ namespace BaseCoffee.DAL.Entities.Concrete
 
         public string Status { get; set; }
 
+        public string? AppUserID { get; set; }
+
+        public AppUser? AppUserr { get; set; }
+
         public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }
